@@ -13,7 +13,7 @@ public class MappingItem {
         dto.setAvailable(item.getAvailable());
         return dto;
     }
-    //из dto в entity
+
     public Item mapToItem(ItemDto dto) {
         Item item = new Item();
         item.setId(dto.getId());

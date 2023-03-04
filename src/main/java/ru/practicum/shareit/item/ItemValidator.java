@@ -13,9 +13,11 @@ public class ItemValidator {
     public boolean nameValidate(String name) {
         return name != null && !name.isBlank();
     }
+
     public boolean descriptionValidate(String descr) {
         return descr != null && !descr.isBlank();
     }
+
     public boolean availableValidate(Boolean available) {
         return available != null;
     }

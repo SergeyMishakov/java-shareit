@@ -5,7 +5,7 @@ import ru.practicum.shareit.item.model.Item;
 
 @Component
 public class MappingItem {
-    public ItemDto mapToItemDto(Item item){
+    public ItemDto mapToItemDto(Item item) {
         ItemDto dto = new ItemDto();
         dto.setId(item.getId());
         dto.setName(item.getName());
@@ -14,7 +14,7 @@ public class MappingItem {
         return dto;
     }
     //из dto в entity
-    public Item mapToItem(ItemDto dto){
+    public Item mapToItem(ItemDto dto) {
         Item item = new Item();
         item.setId(dto.getId());
         item.setName(dto.getName());

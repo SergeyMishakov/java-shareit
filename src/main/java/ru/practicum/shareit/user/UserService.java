@@ -1,7 +1,5 @@
 package ru.practicum.shareit.user;
 
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 public interface UserService {
@@ -15,5 +13,5 @@ public interface UserService {
 
     void deleteUser(long id);
 
-    boolean checkUser(Long userId);
+    void checkUser(Long userId);
 }

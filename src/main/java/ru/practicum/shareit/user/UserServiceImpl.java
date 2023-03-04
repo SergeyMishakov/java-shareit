@@ -10,7 +10,7 @@ import ru.practicum.shareit.exceptions.ValidationException;
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
     private final UserValidator userValidator;
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService{
             throw new ValidationException();
         }
         //проверить уникальность эмейла
-        if(!userStorage.checkUniqueEmail(user.getId(), user.getEmail())) {
+        if (!userStorage.checkUniqueEmail(user.getId(), user.getEmail())) {
             LOG.warn("Нарушение уникальности эмейла");
             throw new RuntimeException();
         }
@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService{
     public User changeUser(long id, User user) {
         user.setId(id);
         if (user.getEmail() != null) {
-            if(!userStorage.checkUniqueEmail(id, user.getEmail())) {
+            if (!userStorage.checkUniqueEmail(id, user.getEmail())) {
                 LOG.warn("Нарушение уникальности эмейла");
                 throw new RuntimeException();
             }
@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public boolean checkUser(Long userId) {
+    public void checkUser(Long userId) {
         if (userId == null) {
             LOG.warn("Влааделец не указан. Проверка не пройдена");
             throw new ValidationException();
@@ -76,6 +76,6 @@ public class UserServiceImpl implements UserService{
             LOG.warn("Влааделец не найден. Проверка не пройдена");
             throw new NotFoundException();
         }
-        return true;
+        return;
     }
 }

@@ -46,7 +46,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item findItemById(long id) {
-        return itemStorage.findItemById(id);
+        if (itemStorage.findItemById(id).isEmpty()) {
+            LOG.warn("Не найдено вещи с таким идентификатором");
+            throw new NotFoundException();
+        }
+        return itemStorage.findItemById(id).get();
     }
 
     @Override
@@ -64,7 +68,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void checkOwner(long userId, long itemId) {
-        Item item = itemStorage.findItemById(itemId);
+        Item item = findItemById(itemId);
         if (item.getOwner() != userId) {
             LOG.warn("У пользоваателя не такого предмета");
             throw new NotFoundException();

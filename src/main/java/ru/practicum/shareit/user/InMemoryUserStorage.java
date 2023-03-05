@@ -1,12 +1,16 @@
 package ru.practicum.shareit.user;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.exceptions.NotFoundException;
 
 import java.util.*;
 
 @Repository
 public class InMemoryUserStorage implements UserStorage {
     Map<Long, User> userList = new HashMap<>();
+    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
     @Override
     public User createUser(User user) {
@@ -17,6 +21,10 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User changeUser(User user) {
         User userToUpdate = userList.get(user.getId());
+        if (userToUpdate == null) {
+            LOG.warn("Пользователь не найден");
+            throw new NotFoundException();
+        }
         if (user.getName() != null) {
             userToUpdate.setName(user.getName());
         }
@@ -33,8 +41,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User findUserById(long id) {
-        return userList.get(id);
+    public Optional<User> findUserById(long id) {
+        return Optional.ofNullable(userList.get(id));
     }
 
     @Override

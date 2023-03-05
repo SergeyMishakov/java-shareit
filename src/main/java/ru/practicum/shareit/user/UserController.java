@@ -1,8 +1,7 @@
 package ru.practicum.shareit.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -13,7 +12,6 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-    @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -24,7 +22,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public User change(@PathVariable long id, @RequestBody User user) {
+    public User change(@NotNull @PathVariable long id, @RequestBody User user) {
         return userService.changeUser(id, user);
     }
 
@@ -34,12 +32,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable long id) {
+    public User getUser(@NotNull @PathVariable long id) {
         return userService.findUserById(id);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable long id) {
+    public void deleteUser(@NotNull @PathVariable long id) {
         userService.deleteUser(id);
     }
 }

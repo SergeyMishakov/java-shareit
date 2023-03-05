@@ -1,11 +1,12 @@
 package ru.practicum.shareit.item.dto;
 
-import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.model.Item;
 
-@Component
+import java.util.ArrayList;
+import java.util.List;
+
 public class MappingItem {
-    public ItemDto mapToItemDto(Item item) {
+    public static ItemDto mapToItemDto(Item item) {
         ItemDto dto = new ItemDto();
         dto.setId(item.getId());
         dto.setName(item.getName());
@@ -14,12 +15,20 @@ public class MappingItem {
         return dto;
     }
 
-    public Item mapToItem(ItemDto dto) {
+    public static Item mapToItem(ItemDto dto) {
         Item item = new Item();
         item.setId(dto.getId());
         item.setName(dto.getName());
         item.setDescription(dto.getDescription());
         item.setAvailable(dto.getAvailable());
         return item;
+    }
+
+    public static List<ItemDto> transferToDto(List<Item> itemList) {
+        List<ItemDto> itemDtoList = new ArrayList<>();
+        for (Item item : itemList) {
+            itemDtoList.add(mapToItemDto(item));
+        }
+        return itemDtoList;
     }
 }

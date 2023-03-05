@@ -58,7 +58,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findUserById(long id) {
-        return userStorage.findUserById(id);
+        if (userStorage.findUserById(id).isEmpty()) {
+            LOG.warn("Пользователь не найден");
+            throw new NotFoundException();
+        }
+        return userStorage.findUserById(id).get();
     }
 
     @Override
@@ -69,13 +73,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public void checkUser(Long userId) {
         if (userId == null) {
-            LOG.warn("Влааделец не указан. Проверка не пройдена");
+            LOG.warn("Владелец не указан. Проверка не пройдена");
             throw new ValidationException();
         }
-        if (userStorage.findUserById(userId) == null) {
-            LOG.warn("Влааделец не найден. Проверка не пройдена");
+        if (userStorage.findUserById(userId).isEmpty()) {
+            LOG.warn("Владелец не найден. Проверка не пройдена");
             throw new NotFoundException();
         }
-        return;
     }
 }

@@ -12,6 +12,7 @@ public class MappingItem {
         dto.setName(item.getName());
         dto.setDescription(item.getDescription());
         dto.setAvailable(item.getAvailable());
+        dto.setComments(new ArrayList<>());
         return dto;
     }
 

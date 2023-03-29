@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserById(long id) {
         Optional<User> optUser = userRepository.findById(id);
-        if(optUser.isEmpty()) {
+        if (optUser.isEmpty()) {
             throw new NotFoundException();
         }
         return optUser.get();

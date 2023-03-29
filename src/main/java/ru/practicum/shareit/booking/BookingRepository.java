@@ -52,5 +52,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "order by end_date desc " +
             "limit 1",
             nativeQuery = true)
-    Booking findLastBookingByBookerId(long item_id, long userId);
+    Booking findLastBookingByBookerId(long itemId, long userId);
 }

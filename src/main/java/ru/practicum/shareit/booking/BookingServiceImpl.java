@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exceptions.BadRequest;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
@@ -94,8 +95,8 @@ public class BookingServiceImpl implements BookingService {
             case "ALL":
                 return bookingRepository.findByBooker_Id(bookerId, Sort.by("start").descending());
             case "CURRENT" :
-                return bookingRepository.findByBooker_IdAndStartIsBeforeAndEndIsAfter
-                        (bookerId, LocalDateTime.now(), LocalDateTime.now(), Sort.by("start").descending());
+                return bookingRepository.findByBooker_IdAndStartIsBeforeAndEndIsAfter(
+                        bookerId, LocalDateTime.now(), LocalDateTime.now(), Sort.by("start").descending());
             case "PAST":
                 return bookingRepository.findByBooker_IdAndEndIsBefore(bookerId, LocalDateTime.now(),
                         Sort.by("start").descending());
@@ -110,7 +111,7 @@ public class BookingServiceImpl implements BookingService {
                         Sort.by("start").descending());
             default:
                 LOG.warn("Некорректное значение state");
-                throw new RuntimeException(String.format("Unknown state: %s", state));
+                throw new IllegalArgumentException(String.format("Unknown state: %s", state));
         }
     }
 
@@ -141,7 +142,7 @@ public class BookingServiceImpl implements BookingService {
                         Sort.by("start").descending());
             default:
                 LOG.warn("Некорректное значение state");
-                throw new ValidationException(String.format("Unknown state: %s", state));
+                throw new IllegalArgumentException(String.format("Unknown state: %s", state));
         }
     }
 }

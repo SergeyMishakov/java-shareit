@@ -15,7 +15,7 @@ public class Comment {
     @NotBlank
     @Column(name = "text", nullable = false)
     private String text;
-    @Column(name="item_id")
+    @Column(name = "item_id")
     private Long item;
     @Column(name = "author_id", nullable = false)
     private long author;

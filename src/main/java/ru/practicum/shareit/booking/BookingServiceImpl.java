@@ -69,7 +69,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking getBookingById(long userId, long id) {
-        Booking booking =bookingRepository.findById(id).orElseThrow(NotFoundException::new);
+        Booking booking = bookingRepository.findById(id).orElseThrow(NotFoundException::new);
         if (userId != booking.getBooker().getId() && userId != booking.getItem().getOwner()) {
             LOG.warn("У пользователя нет такого бронирования");
             throw new NotFoundException();

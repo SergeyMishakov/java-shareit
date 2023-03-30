@@ -19,11 +19,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @NotBlank
-    @Size(max=255)
+    @Size(max = 255)
     @Column(name = "name", nullable = false)
     private String name;
     @NotNull
-    @Size(max=100)
+    @Size(max = 100)
     @Email(message = "Email should be valid")
     @NotBlank(message = "Email missing")
     @Column(name = "email", nullable = false, unique = true)

@@ -6,20 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
-
 import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
     private final UserValidator userValidator;
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
-    private long idIncrement = 0;
 
     @Autowired
-    public UserServiceImpl(UserStorage userStorage, UserValidator userValidator) {
-        this.userStorage = userStorage;
+    public UserServiceImpl(UserRepository userRepository, UserValidator userValidator) {
+        this.userRepository = userRepository;
         this.userValidator = userValidator;
     }
 
@@ -29,45 +27,34 @@ public class UserServiceImpl implements UserService {
             LOG.warn("Валидация пользователя не пройдена");
             throw new ValidationException();
         }
-        //проверить уникальность эмейла
-        if (!userStorage.checkUniqueEmail(user.getId(), user.getEmail())) {
-            LOG.warn("Нарушение уникальности эмейла");
-            throw new RuntimeException();
-        }
-        idIncrement++;
-        user.setId(idIncrement);
-        return userStorage.createUser(user);
+        return userRepository.save(user);
     }
 
     @Override
     public User changeUser(long id, User user) {
-        user.setId(id);
-        if (user.getEmail() != null) {
-            if (!userStorage.checkUniqueEmail(id, user.getEmail())) {
-                LOG.warn("Нарушение уникальности эмейла");
-                throw new RuntimeException();
-            }
+        User changedUser = userRepository.findById(id).orElseThrow(NotFoundException::new);
+        if (user.getName() != null) {
+            changedUser.setName(user.getName());
         }
-        return userStorage.changeUser(user);
+        if (user.getEmail() != null) {
+            changedUser.setEmail(user.getEmail());
+        }
+        return userRepository.save(changedUser);
     }
 
     @Override
     public List<User> getAllUsers() {
-        return userStorage.getAllUsers();
+        return userRepository.findAll();
     }
 
     @Override
     public User findUserById(long id) {
-        if (userStorage.findUserById(id).isEmpty()) {
-            LOG.warn("Пользователь не найден");
-            throw new NotFoundException();
-        }
-        return userStorage.findUserById(id).get();
+        return userRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 
     @Override
     public void deleteUser(long id) {
-        userStorage.deleteUser(id);
+        userRepository.deleteById(id);
     }
 
     @Override
@@ -76,9 +63,6 @@ public class UserServiceImpl implements UserService {
             LOG.warn("Владелец не указан. Проверка не пройдена");
             throw new ValidationException();
         }
-        if (userStorage.findUserById(userId).isEmpty()) {
-            LOG.warn("Владелец не найден. Проверка не пройдена");
-            throw new NotFoundException();
-        }
+        userRepository.findById(userId).orElseThrow(NotFoundException::new);
     }
 }

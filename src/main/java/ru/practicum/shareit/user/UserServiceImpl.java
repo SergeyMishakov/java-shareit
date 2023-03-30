@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
-
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -34,12 +32,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User changeUser(long id, User user) {
-        Optional<User> optUser = userRepository.findById(id);
-        if (optUser.isEmpty()) {
-            LOG.warn("Пользователь не найден");
-            throw new NotFoundException();
-        }
-        User changedUser = optUser.get();
+        User changedUser = userRepository.findById(id).orElseThrow(NotFoundException::new);
         if (user.getName() != null) {
             changedUser.setName(user.getName());
         }
@@ -56,11 +49,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findUserById(long id) {
-        Optional<User> optUser = userRepository.findById(id);
-        if (optUser.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return optUser.get();
+        return userRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 
     @Override
@@ -74,9 +63,6 @@ public class UserServiceImpl implements UserService {
             LOG.warn("Владелец не указан. Проверка не пройдена");
             throw new ValidationException();
         }
-        if (userRepository.findById(userId).isEmpty()) {
-            LOG.warn("Владелец не найден. Проверка не пройдена");
-            throw new NotFoundException();
-        }
+        userRepository.findById(userId).orElseThrow(NotFoundException::new);
     }
 }

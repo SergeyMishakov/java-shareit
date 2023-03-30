@@ -31,11 +31,10 @@ public class ErrorHandler {
         return new RuntimeException(e.getMessage());
     }
 
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public Map<String, String> handle(final IllegalArgumentException e) {
+    public Map<String, String> handle(final IllegalStateException e) {
         return Map.of("error", e.getMessage());
     }
 }

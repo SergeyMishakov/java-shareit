@@ -16,26 +16,26 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
-    private final ItemValidator itemValidator;
     private final CommentRepository commentRepository;
     private final CommentValidator commentValidator;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
-    public ItemServiceImpl(ItemRepository itemRepository, ItemValidator itemValidator, CommentRepository commentRepository, CommentValidator commentValidator, UserRepository userRepository, BookingRepository bookingRepository) {
+    public ItemServiceImpl(ItemRepository itemRepository,
+                           CommentRepository commentRepository,
+                           CommentValidator commentValidator,
+                           UserRepository userRepository,
+                           BookingRepository bookingRepository) {
         this.itemRepository = itemRepository;
-        this.itemValidator = itemValidator;
         this.commentRepository = commentRepository;
         this.commentValidator = commentValidator;
         this.userRepository = userRepository;
@@ -44,11 +44,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item createItem(long userId, Item item) {
-        //проверить предмет
-        if (!itemValidator.validate(item)) {
-            LOG.warn("Валидация предмета не пройдена");
-            throw new ValidationException();
-        }
         item.setOwner(userId);
         return itemRepository.save(item);
     }
@@ -70,11 +65,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto findItemDtoById(long userId, long id) {
-        if (itemRepository.findById(id).isEmpty()) {
-            LOG.warn("Не найдено вещи с таким идентификатором");
-            throw new NotFoundException();
-        }
-        Item item = itemRepository.findById(id).get();
+        Item item = itemRepository.findById(id).orElseThrow(NotFoundException::new);
         ItemDto itemDto = MappingItem.mapToItemDto(item);
         if (item.getOwner() == userId) {
             Booking lastBooking = bookingRepository.findLastBookingByItemId(itemDto.getId());
@@ -99,11 +90,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item findItemById(long id) {
-        if (itemRepository.findById(id).isEmpty()) {
-            LOG.warn("Не найдено вещи с таким идентификатором");
-            throw new NotFoundException();
-        }
-        return itemRepository.findById(id).get();
+        return itemRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 
     @Override
@@ -138,11 +125,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void checkOwner(long userId, long itemId) {
-        Optional<Item> optItem = itemRepository.findById(itemId);
-        if (optItem.isEmpty()) {
-            throw new NotFoundException();
-        }
-        Item item = optItem.get();
+        Item item = itemRepository.findById(itemId).orElseThrow(NotFoundException::new);
         if (item.getOwner() != userId) {
             LOG.warn("У пользователя нет такого предмета");
             throw new NotFoundException();
@@ -151,12 +134,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void checkItem(long itemId) {
-        Optional<Item> optItem = itemRepository.findById(itemId);
-        if (optItem.isEmpty()) {
-            LOG.warn("Предмет для бронирования не найден");
-            throw new NotFoundException();
-        }
-        if (!optItem.get().getAvailable()) {
+        Item item = itemRepository.findById(itemId).orElseThrow(NotFoundException::new);
+        if (!item.getAvailable()) {
             LOG.warn("Предмет не доступен для бронирования");
             throw new ValidationException();
         }

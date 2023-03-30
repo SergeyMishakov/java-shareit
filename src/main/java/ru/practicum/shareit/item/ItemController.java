@@ -3,12 +3,13 @@ package ru.practicum.shareit.item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.MappingItem;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.user.UserService;
+
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -21,23 +22,19 @@ import java.util.List;
 public class ItemController {
     private final ItemService itemService;
     private final UserService userService;
-    private final ItemValidator itemValidator;
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
-    public ItemController(ItemService itemService, UserService userService, ItemValidator itemValidator) {
+    public ItemController(ItemService itemService, UserService userService) {
         this.itemService = itemService;
         this.userService = userService;
-        this.itemValidator = itemValidator;
     }
 
     //Добавление новой вещи
     @PostMapping
-    public ItemDto create(@NotNull @RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto itemDto) {
+    public ItemDto create(
+            @NotNull @RequestHeader("X-Sharer-User-Id") Long userId,
+            @Valid @RequestBody ItemDto itemDto) {
         LOG.info("Получен запрос добавления новой вещи");
-        if (!itemValidator.validate(MappingItem.mapToItem(itemDto))) {
-            LOG.warn("Валидация вещи не пройдена");
-            throw new ValidationException();
-        }
         userService.checkUser(userId);
         return MappingItem.mapToItemDto(itemService.createItem(userId, MappingItem.mapToItem(itemDto)));
     }
@@ -78,7 +75,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public CommentDto addComment(@NotNull @RequestHeader("X-Sharer-User-Id") Long userId,
                                  @NotNull @PathVariable long itemId,
-                                 @RequestBody Comment comment) {
+                                 @Valid @RequestBody Comment comment) {
         LOG.info("Получен запрос добавления комментария");
         return itemService.addComment(userId, itemId, comment);
     }

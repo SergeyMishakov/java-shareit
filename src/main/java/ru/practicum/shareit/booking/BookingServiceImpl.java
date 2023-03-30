@@ -13,7 +13,6 @@ import ru.practicum.shareit.user.UserService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -51,11 +50,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking updateBooking(long ownerId, long bookingId, Boolean approved) {
         LOG.info("Обновление бронирования");
-        Optional<Booking> optBooking = bookingRepository.findById(bookingId);
-        if (optBooking.isEmpty()) {
-            throw new NotFoundException();
-        }
-        Booking booking = optBooking.get();
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(NotFoundException::new);
         if (booking.getItem().getOwner() != ownerId) {
             LOG.warn("У пользовтеля нет этого предмета");
             throw new NotFoundException();
@@ -74,13 +69,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking getBookingById(long userId, long id) {
-        Optional<Booking> optBooking = bookingRepository.findById(id);
-        if (optBooking.isEmpty()) {
-            LOG.warn("Бронирования не найдено");
-            throw new NotFoundException();
-        }
-        LOG.warn("Бронирования найдено");
-        Booking booking = optBooking.get();
+        Booking booking =bookingRepository.findById(id).orElseThrow(NotFoundException::new);
         if (userId != booking.getBooker().getId() && userId != booking.getItem().getOwner()) {
             LOG.warn("У пользователя нет такого бронирования");
             throw new NotFoundException();
@@ -90,58 +79,68 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<Booking> getBookingList(long bookerId, String state) {
-        switch (state) {
-            case "ALL":
+        checkState(state);
+        switch (State.valueOf(state)) {
+            case ALL:
                 return bookingRepository.findByBooker_Id(bookerId, Sort.by("start").descending());
-            case "CURRENT" :
+            case CURRENT:
                 return bookingRepository.findByBooker_IdAndStartIsBeforeAndEndIsAfter(
                         bookerId, LocalDateTime.now(), LocalDateTime.now(), Sort.by("start").descending());
-            case "PAST":
+            case PAST:
                 return bookingRepository.findByBooker_IdAndEndIsBefore(bookerId, LocalDateTime.now(),
                         Sort.by("start").descending());
-            case "FUTURE":
+            case FUTURE:
                 return bookingRepository.findByBooker_IdAndStartIsAfter(bookerId, LocalDateTime.now(),
                         Sort.by("start").descending());
-            case "WAITING":
+            case WAITING:
                 return bookingRepository.findByBooker_IdAndStatusEquals(bookerId, Status.WAITING,
                         Sort.by("start").descending());
-            case "REJECTED":
+            case REJECTED:
                 return bookingRepository.findByBooker_IdAndStatusEquals(bookerId, Status.REJECTED,
                         Sort.by("start").descending());
             default:
                 LOG.warn("Некорректное значение state");
-                throw new IllegalArgumentException(String.format("Unknown state: %s", state));
+                throw new IllegalStateException(String.format("Unknown state: %s", state));
         }
     }
 
     @Override
     public List<Booking> getBookingByOwner(long ownerId, String state) {
+        checkState(state);
         List<Item> itemList = itemRepository.findItemsByUser(ownerId);
         List<Long> itemIdList = new ArrayList<>();
         for (Item item : itemList) {
             itemIdList.add(item.getId());
         }
-        switch (state) {
-            case "ALL":
+        switch (State.valueOf(state)) {
+            case ALL:
                 return bookingRepository.findByItem_IdIn(itemIdList, Sort.by("start").descending());
-            case "CURRENT" :
+            case CURRENT :
                 return bookingRepository.findByItem_IdInAndStartIsBeforeAndEndIsAfter(itemIdList,
                         LocalDateTime.now(), LocalDateTime.now(), Sort.by("start").descending());
-            case "PAST":
+            case PAST:
                 return bookingRepository.findByItem_IdInAndEndIsBefore(itemIdList, LocalDateTime.now(),
                         Sort.by("start").descending());
-            case "FUTURE":
+            case FUTURE:
                 return bookingRepository.findByItem_IdInAndStartIsAfter(itemIdList, LocalDateTime.now(),
                         Sort.by("start").descending());
-            case "WAITING":
+            case WAITING:
                 return bookingRepository.findByItem_IdInAndStatusEquals(itemIdList, Status.WAITING,
                         Sort.by("start").descending());
-            case "REJECTED":
+            case REJECTED:
                 return bookingRepository.findByItem_IdInAndStatusEquals(itemIdList, Status.REJECTED,
                         Sort.by("start").descending());
             default:
                 LOG.warn("Некорректное значение state");
-                throw new IllegalArgumentException(String.format("Unknown state: %s", state));
+                throw new IllegalStateException(String.format("Unknown state: %s", state));
+        }
+    }
+
+    private void checkState(String state) {
+        try {
+            State.valueOf(state);
+        } catch (Exception e) {
+            throw new IllegalStateException(String.format("Unknown state: %s", state));
         }
     }
 }

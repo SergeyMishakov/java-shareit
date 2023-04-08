@@ -94,8 +94,18 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> findItemsByUser(long userId) {
-        List<Item> itemList = itemRepository.findItemsByUser(userId);
+    public List<ItemDto> findItemsByUser(long userId, Integer from, Integer size) {
+        List<Item> itemList;
+        if (from !=null && size != null) {
+            if (from < 0 || size < 0) {
+                LOG.warn("Для пагинации не допускаются отрицательные значения int и size");
+                throw new ValidationException();
+            }
+            itemList = itemRepository.findItemsByUser(userId, size, from);
+        } else {
+            itemList = itemRepository.findItemsByUser(userId);
+        }
+
         List<ItemDto> itemDtoList = new ArrayList<>();
         for (Item item : itemList) {
             ItemDto itemDto = MappingItem.mapToItemDto(item);
@@ -116,9 +126,16 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> searchItem(String text) {
+    public List<Item> searchItem(String text, Integer from, Integer size) {
         if (text.isEmpty()) {
             return new ArrayList<>();
+        }
+        if (from !=null && size != null) {
+            if (from == 0 && size == 0) {
+                LOG.warn("Нулевое количество запршиваемых данных");
+                throw new ValidationException();
+            }
+            return itemRepository.search(text, size, from);
         }
         return itemRepository.search(text);
     }

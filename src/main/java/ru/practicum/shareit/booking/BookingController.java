@@ -11,6 +11,7 @@ import ru.practicum.shareit.user.UserService;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -60,17 +61,21 @@ public class BookingController {
 
     @GetMapping
     public List<Booking> getBookingList(@NotNull @RequestHeader("X-Sharer-User-Id") Long bookerId,
-                                        @RequestParam (defaultValue = "ALL") String state) {
+                                        @RequestParam (defaultValue = "ALL") String state,
+                                        @PositiveOrZero @RequestParam(required = false) Integer from,
+                                        @PositiveOrZero @RequestParam(required = false) Integer size) {
         LOG.info("Получен запрос просмотра бронирования");
         userService.checkUser(bookerId);
-        return bookingService.getBookingList(bookerId, state);
+        return bookingService.getBookingList(bookerId, state, from, size);
     }
 
     @GetMapping("/owner")
     public List<Booking> getBookingByOwner(@NotNull @RequestHeader("X-Sharer-User-Id") Long ownerId,
-                                           @RequestParam(defaultValue = "ALL") String state) {
+                                           @RequestParam(defaultValue = "ALL") String state,
+                                           @PositiveOrZero @RequestParam(required = false) Integer from,
+                                           @PositiveOrZero @RequestParam(required = false) Integer size) {
         LOG.info("Получен запрос просмотра бронирования");
         userService.checkUser(ownerId);
-        return bookingService.getBookingByOwner(ownerId, state);
+        return bookingService.getBookingByOwner(ownerId, state, from, size);
     }
 }

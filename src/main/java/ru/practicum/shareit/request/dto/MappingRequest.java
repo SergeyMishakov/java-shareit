@@ -11,8 +11,8 @@ public class MappingRequest {
         dto.setCreated(itemRequest.getCreated());
         return dto;
     }
-    
-    public static ItemRequest mapToRequest(ItemRequestDto dto) {
+
+     public static ItemRequest mapToRequest(ItemRequestDto dto) {
         ItemRequest request = new ItemRequest();
         request.setDescription(dto.getDescription());
         request.setCreated(dto.getCreated());

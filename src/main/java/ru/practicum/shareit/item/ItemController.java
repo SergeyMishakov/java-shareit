@@ -9,9 +9,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.MappingItem;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.user.UserService;
-
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;

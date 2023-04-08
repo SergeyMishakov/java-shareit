@@ -9,9 +9,9 @@ public class MappingRequest {
         dto.setId(itemRequest.getId());
         dto.setDescription(itemRequest.getDescription());
         dto.setCreated(itemRequest.getCreated());
-        //сюда нужно вывести список вещей для запроса
         return dto;
     }
+    
     public static ItemRequest mapToRequest(ItemRequestDto dto) {
         ItemRequest request = new ItemRequest();
         request.setDescription(dto.getDescription());

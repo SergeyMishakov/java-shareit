@@ -5,25 +5,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingServiceImpl;
-import ru.practicum.shareit.item.ItemServiceImpl;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.MappingRequest;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserServiceImpl;
-
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest(
@@ -33,9 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ItemRequestServiceIntegrationTest {
 
     private final EntityManager em;
-    private final BookingServiceImpl bookingService;
     private final UserServiceImpl userService;
-    private final ItemServiceImpl itemService;
     private final ItemRequestServiceImpl itemRequestService;
 
     @Test

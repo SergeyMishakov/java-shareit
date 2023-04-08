@@ -80,7 +80,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> getBookingList(long bookerId, String state, Integer from, Integer size) {
         checkState(state);
-        if (from != null && size !=null) {
+        if (from != null && size != null) {
             if (from == 0 && size == 0) {
                 LOG.warn("Нулевое количество запршиваемых данных");
                 throw new ValidationException();
@@ -136,7 +136,7 @@ public class BookingServiceImpl implements BookingService {
         for (Item item : itemList) {
             itemIdList.add(item.getId());
         }
-        if (from != null && size !=null) {
+        if (from != null && size != null) {
             if (from == 0 && size == 0) {
                 LOG.warn("Нулевое количество запршиваемых данных");
                 throw new ValidationException();

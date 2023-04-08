@@ -32,10 +32,10 @@ public class ItemRequestController {
 
     @PostMapping
     public ItemRequestDto create(@Valid @NotNull @RequestHeader("X-Sharer-User-Id") Long requestorId,
-                                 @Valid @RequestBody ItemRequestDto ItemRequestDto) {
+                                 @Valid @RequestBody ItemRequestDto itemRequestDto) {
         LOG.info("Получен запрос добавления нового запроса");
         userService.checkUser(requestorId);
-        return itemRequestService.create(requestorId, MappingRequest.mapToRequest(ItemRequestDto));
+        return itemRequestService.create(requestorId, MappingRequest.mapToRequest(itemRequestDto));
     }
 
     @GetMapping

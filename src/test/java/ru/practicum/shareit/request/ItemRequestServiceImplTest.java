@@ -6,11 +6,6 @@ import org.mockito.Mockito;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 class ItemRequestServiceImplTest {
 
     @Test

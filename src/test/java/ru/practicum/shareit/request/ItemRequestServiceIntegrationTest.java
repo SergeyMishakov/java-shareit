@@ -32,21 +32,17 @@ class ItemRequestServiceIntegrationTest {
     @Test
     void saveRequest() {
         User user = new User();
-        user.setId(1L);
         user.setName("Василий");
         user.setEmail("vasya@gmail.com");
         userService.createUser(user);
         User user2 = new User();
-        user2.setId(2L);
         user2.setName("Иван");
         user2.setEmail("ivan@gmail.com");
         userService.createUser(user2);
         ItemRequest request = new ItemRequest();
-        request.setId(1L);
         request.setDescription("Нужна вещь");
         request.setCreated(LocalDateTime.now());
-        request.setRequestorId(1L);
-        itemRequestService.create(1L, request);
+        itemRequestService.create(user.getId(), request);
         TypedQuery<ItemRequest> query = em.createQuery("Select ir from ItemRequest ir where ir.id = :id", ItemRequest.class);
         ItemRequest targetItemRequest = query.setParameter("id", request.getId()).getSingleResult();
         assertThat(targetItemRequest.getId(), notNullValue());

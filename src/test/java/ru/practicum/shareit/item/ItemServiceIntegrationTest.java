@@ -32,21 +32,17 @@ class ItemServiceIntegrationTest {
     @Test
     void createItem() {
         User user = new User();
-        user.setId(1L);
         user.setName("Василий");
         user.setEmail("vasya@gmail.com");
         User user2 = new User();
-        user2.setId(2L);
         user2.setName("Иван");
         user2.setEmail("ivan@gmail.com");
         userService.createUser(user);
         Item item = new Item();
-        item.setId(1L);
         item.setName("Вещь2");
         item.setDescription("Полезная вещь");
-        item.setOwner(1L);
         item.setAvailable(true);
-        itemService.createItem(1, item);
+        itemService.createItem(user.getId(), item);
         TypedQuery<Item> query = em.createQuery("Select i from Item i where i.id = :id", Item.class);
         Item targetItem = query.setParameter("id", item.getId()).getSingleResult();
         assertThat(targetItem.getId(), notNullValue());

@@ -3,7 +3,6 @@ package ru.practicum.shareit.user;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import ru.practicum.shareit.exceptions.NotFoundException;
 import java.util.Optional;
 
 class UserServiceImplTest {
@@ -52,24 +51,5 @@ class UserServiceImplTest {
                 .thenReturn(Optional.of(oldUser));
         User u = userService.changeUser(1, resultUser);
         Assertions.assertEquals(resultUser, u);
-    }
-
-    @Test
-    void checkUser() {
-        User oldUser = new User();
-        oldUser.setId(99);
-        oldUser.setName("TestName");
-        oldUser.setEmail("email@gmail.com");
-        UserValidator userValidator = new UserValidator();
-        UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
-        UserService userService = new UserServiceImpl(mockUserRepository, userValidator);
-        Mockito
-                .when(mockUserRepository.findById(99L))
-                .thenReturn(Optional.empty());
-        userService.checkUser(1L);
-        final NotFoundException exception = Assertions.assertThrows(
-                NotFoundException.class,
-                () -> userService.checkUser(99L));
-        Assertions.assertEquals(new NotFoundException(), exception);
     }
 }

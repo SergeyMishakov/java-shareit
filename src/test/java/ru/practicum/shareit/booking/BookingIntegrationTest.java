@@ -73,16 +73,16 @@ class BookingIntegrationTest {
         User user2 = new User();
         user2.setName("Иван");
         user2.setEmail("ivan@gmail.com");
-        userService.createUser(user);
-        userService.createUser(user2);
+        User booker1 = userService.createUser(user);
+        User booker2 = userService.createUser(user2);
         Booking booking = new Booking();
         booking.setStatus(Status.WAITING);
         booking.setItem(item);
         booking.setStart(LocalDateTime.now().plusDays(2));
         booking.setEnd(LocalDateTime.now().plusDays(4));
         List<Booking> sourceBookingList = List.of(booking);
-        bookingService.createBooking(2L, booking);
-        List<Booking> targetBookingList = bookingService.getBookingList(2L, "ALL", null, null);
+        bookingService.createBooking(booker2.getId(), booking);
+        List<Booking> targetBookingList = bookingService.getBookingList(booker2.getId(), "ALL", null, null);
         assertThat(sourceBookingList.size(), equalTo(targetBookingList.size()));
         assertThat(sourceBookingList.get(0).getItem().getId(), equalTo(targetBookingList.get(0).getItem().getId()));
     }

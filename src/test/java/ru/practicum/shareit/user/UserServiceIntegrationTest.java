@@ -24,12 +24,10 @@ class UserServiceIntegrationTest {
     @Test
     void createUser() {
         User user = new User();
-        user.setId(1L);
         user.setName("Василий");
         user.setEmail("vasya@gmail.com");
         userService.createUser(user);
         User user2 = new User();
-        user2.setId(2L);
         user2.setName("Иван");
         user2.setEmail("ivan@gmail.com");
         userService.createUser(user2);

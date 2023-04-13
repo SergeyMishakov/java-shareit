@@ -53,6 +53,32 @@ class ItemServiceIntegrationTest {
     }
 
     @Test
+    void changeItem() {
+        User user = new User();
+        user.setName("Василий");
+        user.setEmail("vasya@gmail.com");
+        User savedUser = userService.createUser(user);
+        Item item = new Item();
+        item.setName("Вещь2");
+        item.setDescription("Полезная вещь");
+        item.setAvailable(true);
+        Item savedItem = itemService.createItem(user.getId(), item);
+        Item updatedItem = new Item();
+        updatedItem.setId(savedItem.getId());
+        updatedItem.setName("Вещь2");
+        updatedItem.setDescription("Обновленная полезная вещь");
+        item.setAvailable(true);
+        Item sourceItem = itemService.changeItem(savedUser.getId(), savedItem.getId(), updatedItem);
+        TypedQuery<Item> query = em.createQuery("Select i from Item i where i.id = :id", Item.class);
+        Item targetItem = query.setParameter("id", updatedItem.getId()).getSingleResult();
+        assertThat(targetItem.getId(), notNullValue());
+        assertThat(targetItem.getName(), equalTo(sourceItem.getName()));
+        assertThat(targetItem.getOwner(), equalTo(sourceItem.getOwner()));
+        assertThat(targetItem.getDescription(), equalTo(sourceItem.getDescription()));
+        assertThat(targetItem.getAvailable(), equalTo(sourceItem.getAvailable()));
+    }
+
+    @Test
     void findItemsByUser() {
         User user = new User();
         user.setId(1L);
@@ -78,6 +104,23 @@ class ItemServiceIntegrationTest {
         sourceItemDtoList.add(MappingItem.mapToItemDto(item2));
         List<ItemDto> targetItemDtoList = itemService.findItemsByUser(1L, 0,2);
         assertThat(sourceItemDtoList.size(), equalTo(targetItemDtoList.size()));
+    }
+
+    @Test
+    void findItemDtoById() {
+        User user = new User();
+        user.setName("Василий");
+        user.setEmail("vasya@gmail.com");
+        User savedUser = userService.createUser(user);
+        Item item1 = new Item();
+        item1.setName("Вещь1");
+        item1.setDescription("Полезная вещь11");
+        item1.setOwner(savedUser.getId());
+        item1.setAvailable(true);
+        Item savedItem = itemService.createItem(savedUser.getId(), item1);
+        ItemDto sourceItemDto = MappingItem.mapToItemDto(item1);
+        ItemDto targetItemDtoList = itemService.findItemDtoById(savedUser.getId(), savedItem.getId());
+        assertThat(sourceItemDto, equalTo(targetItemDtoList));
     }
 
     @Test

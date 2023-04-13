@@ -80,4 +80,69 @@ class ItemRequestServiceIntegrationTest {
         List<ItemRequestDto> targetItemRequestDtoList = itemRequestService.getAllRequests(2L, 0, 2);
         assertThat(sourceItemRequestDtoList.size(), equalTo(targetItemRequestDtoList.size()));
     }
+
+    @Test
+    void getRequestList() {
+        User user = new User();
+        user.setId(1L);
+        user.setName("Василий");
+        user.setEmail("vasya@gmail.com");
+        userService.createUser(user);
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setName("Иван");
+        user2.setEmail("ivan@gmail.com");
+        userService.createUser(user2);
+        ItemRequest request1 = new ItemRequest();
+        request1.setId(1L);
+        request1.setDescription("Нужна вещь1");
+        request1.setCreated(LocalDateTime.now());
+        request1.setRequestorId(1L);
+        itemRequestService.create(1L, request1);
+        ItemRequest request2 = new ItemRequest();
+        request2.setId(2L);
+        request2.setDescription("Нужна вещь2");
+        request2.setCreated(LocalDateTime.now());
+        request2.setRequestorId(1L);
+        itemRequestService.create(1L, request2);
+        List<ItemRequestDto> sourceItemRequestDtoList = new ArrayList<>();
+        sourceItemRequestDtoList.add(MappingRequest.mapToRequestDto(request1));
+        sourceItemRequestDtoList.add(MappingRequest.mapToRequestDto(request2));
+        List<ItemRequestDto> targetItemRequestDtoList = itemRequestService.getRequestList(1L);
+        assertThat(sourceItemRequestDtoList.size(), equalTo(targetItemRequestDtoList.size()));
+    }
+
+    @Test
+    void getRequestById() {
+        User user = new User();
+        //user.setId(1L);
+        user.setName("Василий");
+        user.setEmail("vasya@gmail.com");
+        User savedUser1 = userService.createUser(user);
+        User user2 = new User();
+        //user2.setId(2L);
+        user2.setName("Иван");
+        user2.setEmail("ivan@gmail.com");
+        User savedUser2 = userService.createUser(user2);
+        ItemRequest request1 = new ItemRequest();
+        //request1.setId(1L);
+        request1.setDescription("Нужна вещь1");
+        request1.setCreated(LocalDateTime.now());
+        request1.setRequestorId(user.getId());
+        ItemRequestDto sourceItemRequestDto = itemRequestService.create(user.getId(), request1);
+        ItemRequest request2 = new ItemRequest();
+        //request2.setId(2L);
+        request2.setDescription("Нужна вещь2");
+        request2.setCreated(LocalDateTime.now());
+        request2.setRequestorId(1L);
+        ItemRequestDto savedRequestDto2 = itemRequestService.create(user.getId(), request2);
+        //ItemRequestDto sourceItemRequestDto = MappingRequest.mapToRequestDto(request1);
+        ItemRequestDto targetItemRequestDto = itemRequestService.getRequestById(request1.getId());
+        assertThat(sourceItemRequestDto.getId(), equalTo(targetItemRequestDto.getId()));
+        /*List<ItemRequestDto> sourceItemRequestDtoList = new ArrayList<>();
+        sourceItemRequestDtoList.add(MappingRequest.mapToRequestDto(request1));
+        sourceItemRequestDtoList.add(MappingRequest.mapToRequestDto(request2));
+        List<ItemRequestDto> targetItemRequestDtoList = itemRequestService.getRequestList(1L);
+        assertThat(sourceItemRequestDtoList.size(), equalTo(targetItemRequestDtoList.size()));*/
+    }
 }

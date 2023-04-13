@@ -11,18 +11,11 @@ import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.MappingItem;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.request.ItemRequestController;
-import ru.practicum.shareit.request.ItemRequestService;
-import ru.practicum.shareit.request.dto.MappingRequest;
 import ru.practicum.shareit.user.UserService;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -46,7 +39,6 @@ class ItemControllerMvcTest {
     @Autowired
     private MockMvc mvc;
 
-    private Item item;
     Item createItem() {
         Item item = new Item();
         item.setId(1L);

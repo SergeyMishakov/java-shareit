@@ -108,7 +108,7 @@ class UserControllerMvcTest {
 
     @Test
     void deleteUser() throws Exception {
-        mvc.perform(get("/users/1")
+        mvc.perform(delete("/users/1")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))

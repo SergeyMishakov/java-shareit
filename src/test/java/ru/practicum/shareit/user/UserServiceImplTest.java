@@ -97,4 +97,40 @@ class UserServiceImplTest {
                 () -> userService.findUserById(1L));
         Assertions.assertEquals(null, exception.getMessage());
     }
+
+    @Test
+    void checkUser() {
+        User resultUser = new User();
+        resultUser.setId(1);
+        resultUser.setName("updateTestName");
+        resultUser.setEmail("updateEmail@gmail.com");
+        UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
+        UserValidator userValidator = new UserValidator();
+        UserService userService = new UserServiceImpl(mockUserRepository, userValidator);
+        Mockito
+                .when(mockUserRepository.findById(1L))
+                .thenThrow(new NotFoundException());
+        final NotFoundException exception = Assertions.assertThrows(
+                NotFoundException.class,
+                () -> userService.checkUser(1L));
+        Assertions.assertEquals(null, exception.getMessage());
+    }
+
+    @Test
+    void checkEmptyUser() {
+        User resultUser = new User();
+        resultUser.setId(1);
+        resultUser.setName("updateTestName");
+        resultUser.setEmail("updateEmail@gmail.com");
+        UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
+        UserValidator userValidator = new UserValidator();
+        UserService userService = new UserServiceImpl(mockUserRepository, userValidator);
+        Mockito
+                .when(mockUserRepository.findById(1L))
+                .thenThrow(new NotFoundException());
+        final ValidationException exception = Assertions.assertThrows(
+                ValidationException.class,
+                () -> userService.checkUser(null));
+        Assertions.assertEquals(null, exception.getMessage());
+    }
 }

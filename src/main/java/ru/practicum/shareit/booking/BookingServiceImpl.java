@@ -100,8 +100,7 @@ public class BookingServiceImpl implements BookingService {
                 case REJECTED:
                     return bookingRepository.findByBooker_IdAndStatusEquals(bookerId, Status.REJECTED, size, from);
                 default:
-                    LOG.warn("Некорректное значение state");
-                    throw new IllegalStateException(String.format("Unknown state: %s", state));
+                    return new ArrayList<>();
             }
         }
         switch (State.valueOf(state)) {
@@ -123,8 +122,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findByBooker_IdAndStatusEquals(bookerId, Status.REJECTED,
                         Sort.by("start").descending());
             default:
-                LOG.warn("Некорректное значение state");
-                throw new IllegalStateException(String.format("Unknown state: %s", state));
+                return new ArrayList<>();
         }
     }
 
@@ -155,8 +153,7 @@ public class BookingServiceImpl implements BookingService {
                 case REJECTED:
                     return bookingRepository.findByItem_IdInAndStatusEquals(itemIdList, Status.REJECTED, size, from);
                 default:
-                    LOG.warn("Некорректное значение state");
-                    throw new IllegalStateException(String.format("Unknown state: %s", state));
+                    return new ArrayList<>();
             }
         }
         switch (State.valueOf(state)) {
@@ -178,12 +175,12 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findByItem_IdInAndStatusEquals(itemIdList, Status.REJECTED,
                         Sort.by("start").descending());
             default:
-                LOG.warn("Некорректное значение state");
-                throw new IllegalStateException(String.format("Unknown state: %s", state));
+                return new ArrayList<>();
         }
     }
 
-    private void checkState(String state) {
+    @Override
+    public void checkState(String state) {
         try {
             State.valueOf(state);
         } catch (Exception e) {

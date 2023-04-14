@@ -5,11 +5,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.MappingComment;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -122,6 +126,58 @@ class ItemServiceImplTest {
     }
 
     @Test
+    void findItemDtoByIdWithComment() {
+        User user = new User();
+        user.setId(1L);
+        user.setEmail("email@gmail.com");
+        Item item = new Item();
+        item.setName("Вещь1");
+        item.setDescription("Описание вещи");
+        item.setAvailable(true);
+        item.setOwner(1L);
+        Comment comment = new Comment();
+        comment.setId(1L);
+        comment.setText("Текст коммента");
+        comment.setAuthor(1L);
+        comment.setItem(1L);
+        comment.setCreated(LocalDateTime.now());
+        CommentDto commentDto = MappingComment.mapToCommentDto(comment);
+        List<Comment> commentList = List.of(comment);
+        ItemDto resultItem = new ItemDto();
+        resultItem.setName("Вещь1");
+        resultItem.setDescription("Описание вещи");
+        resultItem.setAvailable(true);
+        resultItem.setComments(List.of(commentDto));
+        BookingRepository mockBookingRepository = Mockito.mock(BookingRepository.class);
+        CommentValidator commentValidator = new CommentValidator(mockBookingRepository);
+        ItemRepository mockItemRepository = Mockito.mock(ItemRepository.class);
+        CommentRepository mockCommentRepository = Mockito.mock(CommentRepository.class);
+        UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
+        ItemService itemService = new ItemServiceImpl(mockItemRepository,
+                mockCommentRepository,
+                commentValidator,
+                mockUserRepository,
+                mockBookingRepository);
+        Mockito
+                .when(mockItemRepository.findById(1L))
+                .thenReturn(Optional.of(item));
+        Mockito
+                .when(mockBookingRepository.findLastBookingByItemId(1L))
+                .thenReturn(null);
+        Mockito
+                .when(mockBookingRepository.findNextBookingByItemId(1L))
+                .thenReturn(null);
+        Mockito
+                .when(mockCommentRepository.findByItemId(1L))
+                .thenReturn(commentList);
+        Mockito
+                .when(mockUserRepository.findById(1L))
+                .thenReturn(Optional.of(user));
+        ItemDto i = itemService.findItemDtoById(1L, 1L);
+        Assertions.assertEquals(resultItem, i);
+    }
+
+    @Test
     void findItemById() {
         Item item = new Item();
         item.setName("Вещь1");
@@ -222,6 +278,62 @@ class ItemServiceImplTest {
     }
 
     @Test
+    void searchItemEmpty() {
+        Item item = new Item();
+        item.setId(1L);
+        item.setName("Вещь1");
+        item.setDescription("Описание вещи");
+        item.setAvailable(true);
+        item.setOwner(1L);
+        List<Item> itemList = new ArrayList<>();
+        itemList.add(item);
+        BookingRepository mockBookingRepository = Mockito.mock(BookingRepository.class);
+        CommentValidator commentValidator = new CommentValidator(mockBookingRepository);
+        ItemRepository mockItemRepository = Mockito.mock(ItemRepository.class);
+        CommentRepository mockCommentRepository = Mockito.mock(CommentRepository.class);
+        UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
+        ItemService itemService = new ItemServiceImpl(mockItemRepository,
+                mockCommentRepository,
+                commentValidator,
+                mockUserRepository,
+                mockBookingRepository);
+        Mockito
+                .when(mockItemRepository.search("Вещь"))
+                .thenReturn(itemList);
+        final ValidationException exception = Assertions.assertThrows(
+                ValidationException.class,
+                () -> itemService.searchItem("Вещь", 0, 0));
+        Assertions.assertEquals(null, exception.getMessage());
+    }
+
+    @Test
+    void searchItemBlank() {
+        Item item = new Item();
+        item.setId(1L);
+        item.setName("Вещь1");
+        item.setDescription("Описание вещи");
+        item.setAvailable(true);
+        item.setOwner(1L);
+        List<Item> itemList = new ArrayList<>();
+        itemList.add(item);
+        BookingRepository mockBookingRepository = Mockito.mock(BookingRepository.class);
+        CommentValidator commentValidator = new CommentValidator(mockBookingRepository);
+        ItemRepository mockItemRepository = Mockito.mock(ItemRepository.class);
+        CommentRepository mockCommentRepository = Mockito.mock(CommentRepository.class);
+        UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
+        ItemService itemService = new ItemServiceImpl(mockItemRepository,
+                mockCommentRepository,
+                commentValidator,
+                mockUserRepository,
+                mockBookingRepository);
+        Mockito
+                .when(mockItemRepository.search(""))
+                .thenReturn(itemList);
+        List<Item> il = itemService.searchItem("", null, null);
+        Assertions.assertEquals(new ArrayList<>(), il);
+    }
+
+    @Test
     void addComment() {
         Comment comment = new Comment();
         comment.setText("Хорошая вещь");
@@ -259,5 +371,109 @@ class ItemServiceImplTest {
                 .thenReturn(booking);
         CommentDto cd =  itemService.addComment(1L, 1L, comment);
         Assertions.assertEquals(resultCommentDto, cd);
+    }
+
+    @Test
+    void addCommentError() {
+        Comment comment = new Comment();
+        comment.setText("");
+        Comment savedComment = new Comment();
+        savedComment.setId(1L);
+        savedComment.setText("");
+        savedComment.setAuthor(1L);
+        savedComment.setItem(1L);
+        User user = new User();
+        user.setName("Иннокентий");
+        CommentDto resultCommentDto = new CommentDto();
+        resultCommentDto.setId(1L);
+        resultCommentDto.setText("");
+        resultCommentDto.setAuthorName("Иннокентий");
+        Booking booking = new Booking();
+        booking.setId(1L);
+        BookingRepository mockBookingRepository = Mockito.mock(BookingRepository.class);
+        CommentValidator commentValidator = new CommentValidator(mockBookingRepository);
+        ItemRepository mockItemRepository = Mockito.mock(ItemRepository.class);
+        CommentRepository mockCommentRepository = Mockito.mock(CommentRepository.class);
+        UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
+        ItemService itemService = new ItemServiceImpl(mockItemRepository,
+                mockCommentRepository,
+                commentValidator,
+                mockUserRepository,
+                mockBookingRepository);
+        Mockito
+                .when(mockCommentRepository.save(comment))
+                .thenReturn(savedComment);
+        Mockito
+                .when(mockUserRepository.findById(1L))
+                .thenReturn(Optional.of(user));
+        Mockito
+                .when(mockBookingRepository.findLastBookingByBookerId(1L, 1L))
+                .thenReturn(booking);
+        final ValidationException exception = Assertions.assertThrows(
+                ValidationException.class,
+                () -> itemService.addComment(1L, 1L, comment));
+        Assertions.assertEquals(null, exception.getMessage());
+    }
+
+    @Test
+    void checkOwner() {
+        Item item = new Item();
+        item.setName("Вещь1");
+        item.setDescription("Описание вещи");
+        item.setAvailable(true);
+        item.setOwner(1L);
+        Item resultItem = new Item();
+        resultItem.setName("Вещь1");
+        resultItem.setDescription("Описание вещи");
+        resultItem.setOwner(1L);
+        resultItem.setAvailable(true);
+        BookingRepository mockBookingRepository = Mockito.mock(BookingRepository.class);
+        CommentValidator commentValidator = new CommentValidator(mockBookingRepository);
+        ItemRepository mockItemRepository = Mockito.mock(ItemRepository.class);
+        CommentRepository mockCommentRepository = Mockito.mock(CommentRepository.class);
+        UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
+        ItemService itemService = new ItemServiceImpl(mockItemRepository,
+                mockCommentRepository,
+                commentValidator,
+                mockUserRepository,
+                mockBookingRepository);
+        Mockito
+                .when(mockItemRepository.findById(1L))
+                .thenReturn(Optional.of(item));
+        final NotFoundException exception = Assertions.assertThrows(
+                NotFoundException.class,
+                () -> itemService.checkOwner(2L, 1L));
+        Assertions.assertEquals(null, exception.getMessage());
+    }
+
+    @Test
+    void checkItem() {
+        Item item = new Item();
+        item.setName("Вещь1");
+        item.setDescription("Описание вещи");
+        item.setAvailable(false);
+        item.setOwner(1L);
+        Item resultItem = new Item();
+        resultItem.setName("Вещь1");
+        resultItem.setDescription("Описание вещи");
+        resultItem.setOwner(1L);
+        resultItem.setAvailable(true);
+        BookingRepository mockBookingRepository = Mockito.mock(BookingRepository.class);
+        CommentValidator commentValidator = new CommentValidator(mockBookingRepository);
+        ItemRepository mockItemRepository = Mockito.mock(ItemRepository.class);
+        CommentRepository mockCommentRepository = Mockito.mock(CommentRepository.class);
+        UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
+        ItemService itemService = new ItemServiceImpl(mockItemRepository,
+                mockCommentRepository,
+                commentValidator,
+                mockUserRepository,
+                mockBookingRepository);
+        Mockito
+                .when(mockItemRepository.findById(1L))
+                .thenReturn(Optional.of(item));
+        final ValidationException exception = Assertions.assertThrows(
+                ValidationException.class,
+                () -> itemService.checkItem(1L));
+        Assertions.assertEquals(null, exception.getMessage());
     }
 }

@@ -9,10 +9,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.MappingComment;
 import ru.practicum.shareit.item.dto.MappingItem;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import static org.hamcrest.Matchers.is;
@@ -137,10 +140,41 @@ class ItemControllerMvcTest {
     }
 
     @Test
-    void searchItem() {
+    void searchItem() throws Exception {
+        List<Item> itemList = List.of(createItem());
+        when(itemService.searchItem("Вещь", 0, 1))
+                .thenReturn(itemList);
+        mvc.perform(get("/items/search")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("text", "Вещь")
+                        .param("from", "0")
+                        .param("size", "1")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(itemList.get(0).getId()), Long.class))
+                .andExpect(jsonPath("$.[0].name", is(itemList.get(0).getName())));
     }
 
     @Test
-    void addComment() {
+    void addComment() throws Exception {
+        Comment comment = new Comment();
+        comment.setId(1L);
+        comment.setItem(1L);
+        comment.setText("Хорошая вещь");
+        comment.setAuthor(1L);
+        comment.setCreated(LocalDateTime.now());
+        when(itemService.addComment(1L, 1L, comment))
+                .thenReturn(MappingComment.mapToCommentDto(comment));
+        mvc.perform(post("/items/1/comment")
+                        .header("X-Sharer-User-Id", 1L)
+                        .content(mapper.writeValueAsString(comment))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(comment.getId()), Long.class))
+                .andExpect(jsonPath("$.text", is(comment.getText())));
     }
 }

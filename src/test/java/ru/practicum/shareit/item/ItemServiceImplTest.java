@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.Status;
+import ru.practicum.shareit.booking.dto.MappingBooking;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -123,6 +125,75 @@ class ItemServiceImplTest {
                 .thenReturn(new ArrayList<>());
         ItemDto i = itemService.findItemDtoById(1L, 1L);
         Assertions.assertEquals(resultItem, i);
+    }
+
+    @Test
+    void findItemDtoByIdWithBooking() {
+        /*Item item1 = new Item();
+        item1.setId(1L);
+        item1.setName("Вещь");
+        item1.setDescription("Полезная вещь");
+        item1.setOwner(1L);
+        item1.setAvailable(true);*/
+        User user = new User();
+        user.setId(1L);
+        user.setName("Василий");
+        user.setEmail("vasya@gmail.com");
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setName("Иван");
+        user2.setEmail("ivan@gmail.com");
+        Item item = new Item();
+        item.setId(1L);
+        item.setName("Вещь1");
+        item.setDescription("Описание вещи");
+        item.setAvailable(true);
+        item.setOwner(1L);
+        Booking lastBooking = new Booking();
+        lastBooking.setId(1L);
+        lastBooking.setStatus(Status.WAITING);
+        lastBooking.setItem(item);
+        lastBooking.setStart(LocalDateTime.now().plusDays(4));
+        lastBooking.setEnd(LocalDateTime.now().plusDays(2));
+        lastBooking.setBooker(user2);
+        Booking nextBooking = new Booking();
+        nextBooking.setId(2L);
+        nextBooking.setStatus(Status.WAITING);
+        nextBooking.setItem(item);
+        nextBooking.setStart(LocalDateTime.now().plusDays(4));
+        nextBooking.setEnd(LocalDateTime.now().plusDays(2));
+        nextBooking.setBooker(user2);
+        ItemDto resultItem = new ItemDto();
+        resultItem.setName("Вещь1");
+        resultItem.setDescription("Описание вещи");
+        resultItem.setAvailable(true);
+        resultItem.setComments(new ArrayList<>());
+        resultItem.setLastBooking(MappingBooking.mapToBookingDto(lastBooking));
+        resultItem.setNextBooking(MappingBooking.mapToBookingDto(nextBooking));
+        BookingRepository mockBookingRepository = Mockito.mock(BookingRepository.class);
+        CommentValidator commentValidator = new CommentValidator(mockBookingRepository);
+        ItemRepository mockItemRepository = Mockito.mock(ItemRepository.class);
+        CommentRepository mockCommentRepository = Mockito.mock(CommentRepository.class);
+        UserRepository mockUserRepository = Mockito.mock(UserRepository.class);
+        ItemService itemService = new ItemServiceImpl(mockItemRepository,
+                mockCommentRepository,
+                commentValidator,
+                mockUserRepository,
+                mockBookingRepository);
+        Mockito
+                .when(mockItemRepository.findById(1L))
+                .thenReturn(Optional.of(item));
+        Mockito
+                .when(mockBookingRepository.findLastBookingByItemId(1L))
+                .thenReturn(lastBooking);
+        Mockito
+                .when(mockBookingRepository.findNextBookingByItemId(1L))
+                .thenReturn(nextBooking);
+        Mockito
+                .when(mockCommentRepository.findByItemId(1L))
+                .thenReturn(new ArrayList<>());
+        ItemDto i = itemService.findItemDtoById(1L, 1L);
+        Assertions.assertEquals(resultItem.getName(), i.getName());
     }
 
     @Test

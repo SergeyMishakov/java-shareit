@@ -31,5 +31,6 @@ public class Item {
     private long owner;
     @OneToMany(cascade = CascadeType.ALL)
     private List<Booking> bookingList;
-
+    @Column(name = "request_id")
+    private long requestId;
 }

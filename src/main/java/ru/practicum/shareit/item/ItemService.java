@@ -16,9 +16,9 @@ public interface ItemService {
 
     Item findItemById(long id);
 
-    List<ItemDto> findItemsByUser(long userId);
+    List<ItemDto> findItemsByUser(long userId, Integer from, Integer size);
 
-    List<Item> searchItem(String text);
+    List<Item> searchItem(String text, Integer from, Integer size);
 
     void checkOwner(long userId, long itemId);
 

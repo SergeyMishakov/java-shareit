@@ -78,8 +78,31 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getBookingList(long bookerId, String state) {
+    public List<Booking> getBookingList(long bookerId, String state, Integer from, Integer size) {
         checkState(state);
+        if (from != null && size != null) {
+            if (from == 0 && size == 0) {
+                LOG.warn("Нулевое количество запршиваемых данных");
+                throw new ValidationException();
+            }
+            switch (State.valueOf(state)) {
+                case ALL:
+                    return bookingRepository.findByBooker_Id(bookerId, size, from);
+                case CURRENT:
+                    return bookingRepository.findByBooker_IdAndStartIsBeforeAndEndIsAfter(
+                            bookerId, size, from);
+                case PAST:
+                    return bookingRepository.findByBooker_IdAndEndIsBefore(bookerId, size, from);
+                case FUTURE:
+                    return bookingRepository.findByBooker_IdAndStartIsAfter(bookerId, size, from);
+                case WAITING:
+                    return bookingRepository.findByBooker_IdAndStatusEquals(bookerId, Status.WAITING, size, from);
+                case REJECTED:
+                    return bookingRepository.findByBooker_IdAndStatusEquals(bookerId, Status.REJECTED, size, from);
+                default:
+                    return new ArrayList<>();
+            }
+        }
         switch (State.valueOf(state)) {
             case ALL:
                 return bookingRepository.findByBooker_Id(bookerId, Sort.by("start").descending());
@@ -99,18 +122,39 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findByBooker_IdAndStatusEquals(bookerId, Status.REJECTED,
                         Sort.by("start").descending());
             default:
-                LOG.warn("Некорректное значение state");
-                throw new IllegalStateException(String.format("Unknown state: %s", state));
+                return new ArrayList<>();
         }
     }
 
     @Override
-    public List<Booking> getBookingByOwner(long ownerId, String state) {
+    public List<Booking> getBookingByOwner(long ownerId, String state, Integer from, Integer size) {
         checkState(state);
         List<Item> itemList = itemRepository.findItemsByUser(ownerId);
         List<Long> itemIdList = new ArrayList<>();
         for (Item item : itemList) {
             itemIdList.add(item.getId());
+        }
+        if (from != null && size != null) {
+            if (from == 0 && size == 0) {
+                LOG.warn("Нулевое количество запршиваемых данных");
+                throw new ValidationException();
+            }
+            switch (State.valueOf(state)) {
+                case ALL:
+                    return bookingRepository.findByItem_IdIn(itemIdList, size, from);
+                case CURRENT :
+                    return bookingRepository.findByItem_IdInAndStartIsBeforeAndEndIsAfter(itemIdList, size, from);
+                case PAST:
+                    return bookingRepository.findByItem_IdInAndEndIsBefore(itemIdList, size, from);
+                case FUTURE:
+                    return bookingRepository.findByItem_IdInAndStartIsAfter(itemIdList, size, from);
+                case WAITING:
+                    return bookingRepository.findByItem_IdInAndStatusEquals(itemIdList, Status.WAITING, size, from);
+                case REJECTED:
+                    return bookingRepository.findByItem_IdInAndStatusEquals(itemIdList, Status.REJECTED, size, from);
+                default:
+                    return new ArrayList<>();
+            }
         }
         switch (State.valueOf(state)) {
             case ALL:
@@ -131,12 +175,12 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findByItem_IdInAndStatusEquals(itemIdList, Status.REJECTED,
                         Sort.by("start").descending());
             default:
-                LOG.warn("Некорректное значение state");
-                throw new IllegalStateException(String.format("Unknown state: %s", state));
+                return new ArrayList<>();
         }
     }
 
-    private void checkState(String state) {
+    @Override
+    public void checkState(String state) {
         try {
             State.valueOf(state);
         } catch (Exception e) {

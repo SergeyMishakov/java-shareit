@@ -13,6 +13,7 @@ public class MappingItem {
         dto.setDescription(item.getDescription());
         dto.setAvailable(item.getAvailable());
         dto.setComments(new ArrayList<>());
+        dto.setRequestId(item.getRequestId());
         return dto;
     }
 
@@ -22,6 +23,7 @@ public class MappingItem {
         item.setName(dto.getName());
         item.setDescription(dto.getDescription());
         item.setAvailable(dto.getAvailable());
+        item.setRequestId(dto.getRequestId());
         return item;
     }
 

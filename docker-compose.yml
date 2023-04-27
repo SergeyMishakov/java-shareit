@@ -1,0 +1,47 @@
+version: '3.8'
+# версия Docker Compose
+
+# имена и описания контейнеров, которые должны быть развёрнуты
+services:
+  gateway:
+    build: gateway
+    image: shareit-gateway
+    container_name: shareit-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - server
+    environment:
+      - SHAREIT_SERVER_URL=http://server:9090
+      - TZ=Europe/Moscow
+
+  server:
+    build: server
+    image: shareit-server
+    container_name: shareit-server
+    ports:
+      - "9091:9090"
+    depends_on:
+      - db
+    environment:
+      - DB_NAME=shareit
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - DB_HOST=db
+      - DB_PORT=5432
+      - TZ=Europe/Moscow
+
+  # описание контейнера db
+  db:
+    # образ, из которого должен быть запущен контейнер
+    image: postgres:13.7-alpine
+    # volume и связанная с ним директория в контейнере
+    volumes:
+      - /var/lib/postgresql/data/
+    # переменные окружения
+    environment:
+      - POSTGRES_DB=shareit
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - TZ=Europe/Moscow
+

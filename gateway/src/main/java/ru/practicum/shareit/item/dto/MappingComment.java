@@ -2,9 +2,6 @@ package ru.practicum.shareit.item.dto;
 
 import ru.practicum.shareit.item.model.Comment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MappingComment {
 
     public static CommentDto mapToCommentDto(Comment comment) {

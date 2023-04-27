@@ -35,7 +35,7 @@ public class ItemRequestClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getAllRequests(Long requestorId, Integer from, Integer size) {
-        if (from != null && size !=null) {
+        if (from != null && size != null) {
             Map<String, Object> parameters = Map.of(
                     "from", from,
                     "size", size

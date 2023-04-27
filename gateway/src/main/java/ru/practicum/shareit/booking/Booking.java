@@ -3,7 +3,6 @@ import lombok.Data;
 import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
-
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 

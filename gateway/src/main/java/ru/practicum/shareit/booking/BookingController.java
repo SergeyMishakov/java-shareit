@@ -1,35 +1,34 @@
 package ru.practicum.shareit.booking;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookItemRequestDto;
 import ru.practicum.shareit.booking.dto.BookingState;
+
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import javax.validation.ValidationException;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
 @RestController
 @RequestMapping(path = "/bookings")
+@RequiredArgsConstructor
 @Slf4j
 @Validated
 public class BookingController {
 
 	private final BookingClient bookingClient;
-
-	@Autowired
-	public BookingController(BookingClient bookingClient) {
-		this.bookingClient = bookingClient;
-	}
+	private final BookingValidator bookingValidator;
 
 	@GetMapping
 	public ResponseEntity<Object> getBookings(@RequestHeader("X-Sharer-User-Id") long userId,
 			@RequestParam(name = "state", defaultValue = "all") String stateParam,
-			@PositiveOrZero @RequestParam(name = "from", required = false) Integer from,
-			@Positive @RequestParam(name = "size", required = false) Integer size) {
+			@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+			@Positive @RequestParam(defaultValue = "10") Integer size) {
 		BookingState state = BookingState.from(stateParam)
 				.orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
 		log.info("Get booking with state {}, userId={}, from={}, size={}", stateParam, userId, from, size);
@@ -39,8 +38,8 @@ public class BookingController {
 	@GetMapping("/owner")
 	public ResponseEntity<Object> getBookingsByOwner(@RequestHeader("X-Sharer-User-Id") long userId,
 			@RequestParam(name = "state", defaultValue = "all") String stateParam,
-			@PositiveOrZero @RequestParam(name = "from", required = false) Integer from,
-			@Positive @RequestParam(name = "size", required = false) Integer size) {
+			@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+			@Positive @RequestParam(defaultValue = "10") Integer size) {
 		BookingState state = BookingState.from(stateParam)
 				.orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
 		log.info("Get booking with state {}, userId={}, from={}, size={}", stateParam, userId, from, size);
@@ -51,6 +50,9 @@ public class BookingController {
 	public ResponseEntity<Object> bookItem(@RequestHeader("X-Sharer-User-Id") long userId,
 			@RequestBody @Valid BookItemRequestDto requestDto) {
 		log.info("Creating booking {}, userId={}", requestDto, userId);
+		if (!bookingValidator.validate(requestDto)) {
+			throw new ValidationException("Не пройдена валидация даты начала и окончания бронирования");
+		}
 		return bookingClient.bookItem(userId, requestDto);
 	}
 
@@ -62,9 +64,9 @@ public class BookingController {
 	}
 
 	@PatchMapping("/{bookingId}")
-	public ResponseEntity<Object> change(@NotNull @RequestHeader("X-Sharer-User-Id") Long ownerId,
+	public ResponseEntity<Object> change(@RequestHeader("X-Sharer-User-Id") Long ownerId,
 						  @PathVariable int bookingId,
-						  @NotNull @RequestParam Boolean approved) {
+						  @RequestParam Boolean approved) {
 		log.info("Получен запрос обновления бронирования");
 		return bookingClient.change(ownerId, bookingId, approved);
 	}

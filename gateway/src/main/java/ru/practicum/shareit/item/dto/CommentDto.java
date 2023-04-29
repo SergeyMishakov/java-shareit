@@ -9,5 +9,5 @@ public class CommentDto {
     private long id;
     private String text;
     private String authorName;
-    LocalDateTime created;
+    private LocalDateTime created;
 }

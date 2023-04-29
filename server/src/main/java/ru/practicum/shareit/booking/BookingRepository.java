@@ -70,7 +70,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "order by start_date desc " +
             "limit ?3 OFFSET ?4",
             nativeQuery = true)
-    List<Booking> findByBooker_IdAndStatusEquals(Long bookerId, Status status, Integer size, Integer from);
+    List<Booking> findByBooker_IdAndStatusEquals(Long bookerId, String status, Integer size, Integer from);
 
     @Query(value = "select * from bookings b " +
             "where item_id IN ?1 " +
@@ -111,7 +111,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "order by start_date desc " +
             "limit ?3 OFFSET ?4",
             nativeQuery = true)
-    List<Booking> findByItem_IdInAndStatusEquals(List<Long> itemId, Status status, Integer size, Integer from);
+    List<Booking> findByItem_IdInAndStatusEquals(List<Long> itemId, String status, Integer size, Integer from);
 
     @Query(value = "select * from bookings b " +
     "where item_id = ?1 " +

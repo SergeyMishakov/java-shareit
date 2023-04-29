@@ -96,9 +96,9 @@ public class BookingServiceImpl implements BookingService {
                 case FUTURE:
                     return bookingRepository.findByBooker_IdAndStartIsAfter(bookerId, size, from);
                 case WAITING:
-                    return bookingRepository.findByBooker_IdAndStatusEquals(bookerId, Status.WAITING, size, from);
+                    return bookingRepository.findByBooker_IdAndStatusEquals(bookerId, Status.WAITING.toString(), size, from);
                 case REJECTED:
-                    return bookingRepository.findByBooker_IdAndStatusEquals(bookerId, Status.REJECTED, size, from);
+                    return bookingRepository.findByBooker_IdAndStatusEquals(bookerId, Status.REJECTED.toString(), size, from);
                 default:
                     return new ArrayList<>();
             }
@@ -149,9 +149,9 @@ public class BookingServiceImpl implements BookingService {
                 case FUTURE:
                     return bookingRepository.findByItem_IdInAndStartIsAfter(itemIdList, size, from);
                 case WAITING:
-                    return bookingRepository.findByItem_IdInAndStatusEquals(itemIdList, Status.WAITING, size, from);
+                    return bookingRepository.findByItem_IdInAndStatusEquals(itemIdList, Status.WAITING.toString(), size, from);
                 case REJECTED:
-                    return bookingRepository.findByItem_IdInAndStatusEquals(itemIdList, Status.REJECTED, size, from);
+                    return bookingRepository.findByItem_IdInAndStatusEquals(itemIdList, Status.REJECTED.toString(), size, from);
                 default:
                     return new ArrayList<>();
             }

@@ -13,5 +13,5 @@ public class Comment {
     private String text;
     private long item;
     private long author;
-    LocalDateTime created;
+    private LocalDateTime created;
 }

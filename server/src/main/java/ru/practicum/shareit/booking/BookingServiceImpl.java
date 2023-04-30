@@ -12,6 +12,7 @@ import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -100,7 +101,7 @@ public class BookingServiceImpl implements BookingService {
                 case REJECTED:
                     return bookingRepository.findByBooker_IdAndStatusEquals(bookerId, Status.REJECTED.toString(), size, from);
                 default:
-                    return new ArrayList<>();
+                    return Collections.emptyList();
             }
         }
         switch (State.valueOf(state)) {
@@ -122,7 +123,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findByBooker_IdAndStatusEquals(bookerId, Status.REJECTED,
                         Sort.by("start").descending());
             default:
-                return new ArrayList<>();
+                return Collections.emptyList();
         }
     }
 
@@ -153,7 +154,7 @@ public class BookingServiceImpl implements BookingService {
                 case REJECTED:
                     return bookingRepository.findByItem_IdInAndStatusEquals(itemIdList, Status.REJECTED.toString(), size, from);
                 default:
-                    return new ArrayList<>();
+                    return Collections.emptyList();
             }
         }
         switch (State.valueOf(state)) {
@@ -175,7 +176,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findByItem_IdInAndStatusEquals(itemIdList, Status.REJECTED,
                         Sort.by("start").descending());
             default:
-                return new ArrayList<>();
+                return Collections.emptyList();
         }
     }
 

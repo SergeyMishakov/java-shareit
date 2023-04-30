@@ -2,7 +2,6 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -13,7 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.ArrayList;
+import java.util.Collections;
 
 @Controller
 @RequestMapping(path = "/items")
@@ -65,7 +64,7 @@ public class ItemController {
                                     @Positive @RequestParam(defaultValue = "10") Integer size) {
         log.info("Получен запрос поиска вещей");
         if (text.isBlank()) {
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+            return ResponseEntity.ok(Collections.emptyList());
         }
         return itemClient.searchItem(text, from, size);
     }

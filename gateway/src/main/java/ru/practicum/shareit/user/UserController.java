@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -16,12 +15,12 @@ public class UserController {
     private final UserClient userClient;
 
     @PostMapping
-    public ResponseEntity<Object> create(@Valid @RequestBody User user) {
+    public ResponseEntity<Object> create(@Validated(Create.class) @RequestBody User user) {
         return userClient.createUser(user);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Object> change(@PathVariable long id, @RequestBody User user) {
+    public ResponseEntity<Object> change(@PathVariable long id, @Validated(Update.class) @RequestBody User user) {
         return userClient.changeUser(id, user);
     }
 

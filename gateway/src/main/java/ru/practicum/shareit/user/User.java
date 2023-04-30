@@ -9,11 +9,11 @@ import javax.validation.constraints.Size;
 public class User {
 
     private long id;
-    @NotBlank
-    @Size(max = 255)
+    @NotBlank(groups = {Create.class})
+    @Size(max = 255, groups = {Create.class, Update.class})
     private String name;
-    @Size(max = 100)
-    @Email(message = "Email should be valid")
-    @NotBlank(message = "Email missing")
+    @Size(max = 100, groups = {Create.class, Update.class})
+    @Email(message = "Email should be valid", groups = {Create.class, Update.class})
+    @NotBlank(message = "Email missing", groups = {Create.class})
     private String email;
 }
